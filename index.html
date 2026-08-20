@@ -36,6 +36,49 @@
   }
   .cabecera .sub{font-size:12px;color:var(--tinta-suave);margin-top:2px;letter-spacing:2px;text-transform:uppercase}
 
+  /* ---- pestañas de vista ---- */
+  .pestanas{
+    display:flex;gap:6px;margin:12px 16px 0;background:var(--blanco);border-radius:18px;
+    box-shadow:var(--sombra);padding:6px;
+  }
+  .pestana{
+    flex:1;border:none;background:none;border-radius:13px;padding:12px 4px;font-size:15.5px;
+    font-weight:800;color:var(--tinta-suave);cursor:pointer;font-family:inherit;
+  }
+  .pestana.activa{
+    background:linear-gradient(135deg,var(--rosa),var(--lila));color:#fff;
+    box-shadow:0 4px 12px rgba(150,82,126,.3);
+  }
+
+  /* ---- listados semana / mes ---- */
+  .cabecera-lista{
+    display:flex;align-items:center;justify-content:space-between;
+    margin:12px 16px 8px;background:var(--blanco);border-radius:var(--radio);
+    box-shadow:var(--sombra);padding:8px 10px;
+  }
+  .cabecera-lista .titulo-lista{
+    font-family:Georgia,serif;font-size:17.5px;font-weight:600;color:var(--tinta);
+    text-align:center;flex:1;text-transform:capitalize;
+  }
+  .banner-total{
+    margin:0 16px 12px;background:linear-gradient(135deg,var(--rosa-claro),var(--lila-claro));
+    border-radius:var(--radio);padding:13px 16px;text-align:center;
+    font-size:17px;font-weight:800;color:var(--rosa-osc);
+  }
+  .grupo-dia{margin:0 16px 4px}
+  .grupo-dia h3{
+    font-size:14.5px;font-weight:800;color:var(--lila);margin:10px 4px 8px;
+    text-transform:capitalize;letter-spacing:.3px;
+  }
+  .grupo-dia h3 .hoy-marca{
+    background:var(--lila);color:#fff;border-radius:99px;padding:2px 10px;font-size:12px;margin-left:6px;
+  }
+  .lista-vacia{
+    text-align:center;color:var(--tinta-suave);background:var(--blanco);border-radius:var(--radio);
+    padding:30px 16px;box-shadow:var(--sombra);font-size:15.5px;margin:0 16px;
+  }
+  .lista-vacia .emo{font-size:34px;display:block;margin-bottom:8px}
+
   /* ---- barra de mes ---- */
   .barra-mes{
     display:flex;align-items:center;justify-content:space-between;
@@ -56,12 +99,12 @@
   /* ---- calendario ---- */
   .calendario{margin:0 16px;background:var(--blanco);border-radius:var(--radio);box-shadow:var(--sombra);padding:12px 8px 10px}
   .dias-semana,.semana{display:grid;grid-template-columns:repeat(7,1fr)}
-  .dias-semana span{text-align:center;font-size:11px;font-weight:700;color:var(--tinta-suave);padding-bottom:8px;letter-spacing:1px}
+  .dias-semana span{text-align:center;font-size:12.5px;font-weight:700;color:var(--tinta-suave);padding-bottom:8px;letter-spacing:1px}
   .dia{
     aspect-ratio:1/1.15; display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
     border-radius:14px;cursor:pointer;padding-top:6px;position:relative;border:2px solid transparent;
   }
-  .dia .num{font-size:15px;font-weight:600;line-height:1.6}
+  .dia .num{font-size:16.5px;font-weight:600;line-height:1.6}
   .dia.otro-mes .num{color:#cdbfd0}
   .dia.hoy .num{
     background:var(--lila);color:#fff;width:28px;height:28px;border-radius:50%;
@@ -77,23 +120,23 @@
   .titulo-dia{
     display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;padding:0 4px;
   }
-  .titulo-dia h2{font-family:Georgia,serif;font-size:18px;color:var(--rosa-osc);font-weight:600;text-transform:capitalize}
-  .titulo-dia .cuenta{font-size:12.5px;color:var(--tinta-suave);font-weight:600}
+  .titulo-dia h2{font-family:Georgia,serif;font-size:19px;color:var(--rosa-osc);font-weight:600;text-transform:capitalize}
+  .titulo-dia .cuenta{font-size:14px;color:var(--tinta-suave);font-weight:700}
   .cita{
     display:flex;gap:12px;background:var(--blanco);border-radius:var(--radio);box-shadow:var(--sombra);
     padding:14px;margin-bottom:10px;cursor:pointer;align-items:stretch;
   }
   .cita .franja{width:5px;border-radius:6px;flex-shrink:0}
   .cita .hora-col{min-width:52px;text-align:center;align-self:center}
-  .cita .hora-col .h{font-size:17px;font-weight:800;color:var(--tinta)}
-  .cita .hora-col .d{font-size:10.5px;color:var(--tinta-suave);font-weight:600}
+  .cita .hora-col .h{font-size:18px;font-weight:800;color:var(--tinta)}
+  .cita .hora-col .d{font-size:11.5px;color:var(--tinta-suave);font-weight:600}
   .cita .info{flex:1;align-self:center;min-width:0}
-  .cita .nombre{font-size:16px;font-weight:700}
-  .cita .servicio{font-size:13px;color:var(--tinta-suave);margin-top:1px}
-  .cita .extra{font-size:12px;color:var(--tinta-suave);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cita .nombre{font-size:17px;font-weight:700}
+  .cita .servicio{font-size:14px;color:var(--tinta-suave);margin-top:1px}
+  .cita .extra{font-size:13px;color:var(--tinta-suave);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .cita .extra a{color:var(--lila);text-decoration:none;font-weight:700}
   .cita .extra.domi{color:var(--rosa-osc);font-weight:700}
-  .cita .notas{font-size:12px;color:var(--lila);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cita .notas{font-size:13px;color:var(--lila);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .cita .precio{align-self:center;font-weight:800;color:var(--rosa-osc);font-size:15px;white-space:nowrap}
   .vacio{
     text-align:center;color:var(--tinta-suave);background:var(--blanco);border-radius:var(--radio);
@@ -119,13 +162,13 @@
     display:flex;align-items:center;justify-content:center;gap:8px;
   }
   .btn-mas{
-    width:56px;height:56px;border:none;border-radius:18px;font-size:28px;font-weight:600;cursor:pointer;
-    background:linear-gradient(135deg,var(--rosa),var(--lila));color:#fff;
-    box-shadow:0 6px 18px rgba(150,82,126,.4);flex-shrink:0;line-height:1;
+    flex:1.2;border:none;border-radius:16px;padding:15px 8px;font-size:15px;font-weight:800;cursor:pointer;
+    background:linear-gradient(135deg,var(--rosa),var(--lila));color:#fff;font-family:inherit;
+    box-shadow:0 6px 18px rgba(150,82,126,.4);white-space:nowrap;
   }
   .btn-ajustes{
-    width:44px;height:44px;border:none;border-radius:14px;background:var(--blanco);box-shadow:var(--sombra);
-    font-size:19px;cursor:pointer;flex-shrink:0;color:var(--rosa-osc);
+    border:none;border-radius:16px;padding:15px 10px;background:var(--blanco);box-shadow:var(--sombra);
+    font-size:14px;font-weight:800;cursor:pointer;color:var(--rosa-osc);font-family:inherit;white-space:nowrap;
   }
 
   /* ---- hoja modal ---- */
@@ -245,6 +288,13 @@
   <div class="sub">Citas de clientas</div>
 </header>
 
+<div class="pestanas">
+  <button class="pestana activa" id="pesDia">📅 Día</button>
+  <button class="pestana" id="pesSemana">📋 Semana</button>
+  <button class="pestana" id="pesMes">🗓 Mes</button>
+</div>
+
+<div id="vistaDia">
 <div class="barra-mes">
   <button class="flecha" id="prevMes" aria-label="Mes anterior">‹</button>
   <div style="display:flex;align-items:center">
@@ -269,11 +319,32 @@
   <div id="listaCitas"></div>
   <div class="total-dia" id="totalDia"></div>
 </section>
+</div><!-- /vistaDia -->
+
+<div id="vistaSemana" style="display:none">
+  <div class="cabecera-lista">
+    <button class="flecha" id="semAnt" aria-label="Semana anterior">‹</button>
+    <div class="titulo-lista" id="tituloSemana"></div>
+    <button class="flecha" id="semSig" aria-label="Semana siguiente">›</button>
+  </div>
+  <div class="banner-total" id="totalSemana"></div>
+  <div id="listaSemana"></div>
+</div>
+
+<div id="vistaMes" style="display:none">
+  <div class="cabecera-lista">
+    <button class="flecha" id="mesAnt" aria-label="Mes anterior">‹</button>
+    <div class="titulo-lista" id="tituloMesLista"></div>
+    <button class="flecha" id="mesSig" aria-label="Mes siguiente">›</button>
+  </div>
+  <div class="banner-total" id="totalMes"></div>
+  <div id="listaMes"></div>
+</div>
 
 <div class="barra-inferior">
-  <button class="btn-ajustes" id="btnAjustes" aria-label="Ajustes">⚙️</button>
-  <button class="btn-resumen" id="btnResumen">🌞 Resumen de hoy</button>
-  <button class="btn-mas" id="btnNueva" aria-label="Nueva cita">+</button>
+  <button class="btn-ajustes" id="btnAjustes">⚙️ Ajustes</button>
+  <button class="btn-resumen" id="btnResumen">🌞 Resumen</button>
+  <button class="btn-mas" id="btnNueva">➕ Nueva cita</button>
 </div>
 
 <!-- Modal cita -->
@@ -519,26 +590,137 @@
     var total = 0;
     cs.forEach(function(c){
       total += (+c.precio || 0);
-      var el = document.createElement("div");
-      el.className = "cita";
-      el.innerHTML =
-        '<div class="franja" style="background:' + colorServicio(c.servicio) + '"></div>' +
-        '<div class="hora-col"><div class="h">' + esc(c.hora||"–") + '</div><div class="d">' + textoDuracion(c.duracion) + '</div></div>' +
-        '<div class="info"><div class="nombre">' + esc(c.nombre) + '</div>' +
-        (c.servicio ? '<div class="servicio">' + esc(c.servicio) + '</div>' : '') +
-        (c.telefono ? '<div class="extra"><a class="tel-link" href="tel:' + esc(c.telefono.replace(/\s/g,"")) + '">📞 ' + esc(c.telefono) + '</a></div>' : '') +
-        (c.lugar === "domicilio" ? '<div class="extra domi">🚗 A domicilio · ' + esc(c.direccion||"") + '</div>' : '') +
-        (c.notas ? '<div class="notas">📝 ' + esc(c.notas) + '</div>' : '') + '</div>' +
-        (c.precio ? '<div class="precio">' + esc(c.precio) + ' €</div>' : '');
-      el.addEventListener("click", function(){ abrirModal(c.id); });
-      var tl = el.querySelector(".tel-link");
-      if(tl) tl.addEventListener("click", function(e){ e.stopPropagation(); });
-      lista.appendChild(el);
+      lista.appendChild(tarjetaCita(c));
     });
     document.getElementById("totalDia").textContent = total ? ("Total del día: " + total + " €") : "";
   }
 
-  function pintarTodo(){ pintarCalendario(); pintarDia(); }
+  function tarjetaCita(c){
+    var el = document.createElement("div");
+    el.className = "cita";
+    el.innerHTML =
+      '<div class="franja" style="background:' + colorServicio(c.servicio) + '"></div>' +
+      '<div class="hora-col"><div class="h">' + esc(c.hora||"–") + '</div><div class="d">' + textoDuracion(c.duracion) + '</div></div>' +
+      '<div class="info"><div class="nombre">' + esc(c.nombre) + '</div>' +
+      (c.servicio ? '<div class="servicio">' + esc(c.servicio) + '</div>' : '') +
+      (c.telefono ? '<div class="extra"><a class="tel-link" href="tel:' + esc(c.telefono.replace(/\s/g,"")) + '">📞 ' + esc(c.telefono) + '</a></div>' : '') +
+      (c.lugar === "domicilio" ? '<div class="extra domi">🚗 A domicilio · ' + esc(c.direccion||"") + '</div>' : '') +
+      (c.notas ? '<div class="notas">📝 ' + esc(c.notas) + '</div>' : '') + '</div>' +
+      (c.precio ? '<div class="precio">' + esc(c.precio) + ' €</div>' : '');
+    el.addEventListener("click", function(){ abrirModal(c.id); });
+    var tl = el.querySelector(".tel-link");
+    if(tl) tl.addEventListener("click", function(e){ e.stopPropagation(); });
+    return el;
+  }
+
+  // ---- vistas semana y mes ----
+  var vistaActual = "dia";
+  function lunesDe(d){
+    var x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+    return x;
+  }
+  var semanaLunes = lunesDe(new Date());
+  var listaAnio = hoy.getFullYear(), listaMes = hoy.getMonth();
+
+  function grupoDia(f, cs, cont){
+    var claveHoy = claveFecha(new Date());
+    var g = document.createElement("div");
+    g.className = "grupo-dia";
+    var h = document.createElement("h3");
+    h.innerHTML = DIAS[f.getDay()] + " " + f.getDate() +
+      (claveFecha(f) === claveHoy ? ' <span class="hoy-marca">HOY</span>' : '');
+    g.appendChild(h);
+    cs.forEach(function(c){ g.appendChild(tarjetaCita(c)); });
+    cont.appendChild(g);
+  }
+
+  function pintarSemana(){
+    var ini = semanaLunes;
+    var fin = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + 6);
+    var titulo = "del " + ini.getDate() + (ini.getMonth() === fin.getMonth()
+      ? " al " + fin.getDate() + " de " + MESES[fin.getMonth()]
+      : " de " + MESES[ini.getMonth()] + " al " + fin.getDate() + " de " + MESES[fin.getMonth()]);
+    document.getElementById("tituloSemana").textContent = titulo;
+    var cont = document.getElementById("listaSemana");
+    cont.innerHTML = "";
+    var nCitas = 0, total = 0;
+    for(var i = 0; i < 7; i++){
+      var f = new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + i);
+      var cs = citasDe(claveFecha(f));
+      if(cs.length){
+        nCitas += cs.length;
+        cs.forEach(function(c){ total += (+c.precio || 0); });
+        grupoDia(f, cs, cont);
+      }
+    }
+    var banner = document.getElementById("totalSemana");
+    if(nCitas){
+      banner.style.display = "";
+      banner.textContent = "💖 " + nCitas + (nCitas === 1 ? " cita" : " citas") + (total ? " · " + total + " €" : "");
+    } else {
+      banner.style.display = "none";
+      cont.innerHTML = '<div class="lista-vacia"><span class="emo">🌷</span>No hay citas esta semana</div>';
+    }
+  }
+
+  function pintarMes(){
+    document.getElementById("tituloMesLista").textContent = MESES[listaMes] + " " + listaAnio;
+    var cont = document.getElementById("listaMes");
+    cont.innerHTML = "";
+    var ultimo = new Date(listaAnio, listaMes + 1, 0).getDate();
+    var nCitas = 0, total = 0;
+    for(var dia = 1; dia <= ultimo; dia++){
+      var f = new Date(listaAnio, listaMes, dia);
+      var cs = citasDe(claveFecha(f));
+      if(cs.length){
+        nCitas += cs.length;
+        cs.forEach(function(c){ total += (+c.precio || 0); });
+        grupoDia(f, cs, cont);
+      }
+    }
+    var banner = document.getElementById("totalMes");
+    if(nCitas){
+      banner.style.display = "";
+      banner.textContent = "💖 " + nCitas + (nCitas === 1 ? " cita" : " citas") + (total ? " · " + total + " €" : "");
+    } else {
+      banner.style.display = "none";
+      cont.innerHTML = '<div class="lista-vacia"><span class="emo">🌷</span>No hay citas en ' + MESES[listaMes] + '</div>';
+    }
+  }
+
+  function cambiarVista(v){
+    vistaActual = v;
+    document.getElementById("vistaDia").style.display = v === "dia" ? "" : "none";
+    document.getElementById("vistaSemana").style.display = v === "semana" ? "" : "none";
+    document.getElementById("vistaMes").style.display = v === "mes" ? "" : "none";
+    document.getElementById("pesDia").classList.toggle("activa", v === "dia");
+    document.getElementById("pesSemana").classList.toggle("activa", v === "semana");
+    document.getElementById("pesMes").classList.toggle("activa", v === "mes");
+    window.scrollTo(0, 0);
+  }
+  document.getElementById("pesDia").addEventListener("click", function(){ cambiarVista("dia"); });
+  document.getElementById("pesSemana").addEventListener("click", function(){ cambiarVista("semana"); });
+  document.getElementById("pesMes").addEventListener("click", function(){ cambiarVista("mes"); });
+
+  document.getElementById("semAnt").addEventListener("click", function(){
+    semanaLunes = new Date(semanaLunes.getFullYear(), semanaLunes.getMonth(), semanaLunes.getDate() - 7);
+    pintarSemana();
+  });
+  document.getElementById("semSig").addEventListener("click", function(){
+    semanaLunes = new Date(semanaLunes.getFullYear(), semanaLunes.getMonth(), semanaLunes.getDate() + 7);
+    pintarSemana();
+  });
+  document.getElementById("mesAnt").addEventListener("click", function(){
+    listaMes--; if(listaMes < 0){ listaMes = 11; listaAnio--; }
+    pintarMes();
+  });
+  document.getElementById("mesSig").addEventListener("click", function(){
+    listaMes++; if(listaMes > 11){ listaMes = 0; listaAnio++; }
+    pintarMes();
+  });
+
+  function pintarTodo(){ pintarCalendario(); pintarDia(); pintarSemana(); pintarMes(); }
 
   // ---- chips de tratamiento ----
   var chipsBox = document.getElementById("chipsTratamiento");
@@ -660,6 +842,7 @@
     seleccionado = fecha;
     var ff = desdeClave(fecha);
     vistaMes = ff.getMonth(); vistaAnio = ff.getFullYear();
+    semanaLunes = lunesDe(ff); listaAnio = ff.getFullYear(); listaMes = ff.getMonth();
     cerrarModal();
     pintarTodo();
     aviso("Cita guardada 💖");
@@ -691,6 +874,7 @@
   document.getElementById("btnHoy").addEventListener("click", function(){
     var h = new Date();
     vistaAnio = h.getFullYear(); vistaMes = h.getMonth(); seleccionado = claveFecha(h);
+    semanaLunes = lunesDe(h); listaAnio = h.getFullYear(); listaMes = h.getMonth();
     pintarTodo();
   });
 
