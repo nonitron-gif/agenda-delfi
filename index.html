@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Agenda Delfi">
+<meta name="theme-color" content="#b76e9b">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-512.png">
+<title>Agenda de Delfi 💖</title>
+<style>
+  :root{
+    --rosa:#b76e9b; --rosa-osc:#96527e; --rosa-claro:#f7e8f1; --lila:#9b8ec4; --lila-claro:#efecf8;
+    --crema:#fdf9f6; --tinta:#4a3546; --tinta-suave:#8d7186; --blanco:#ffffff;
+    --sombra:0 6px 24px rgba(150,82,126,.14);
+    --radio:18px;
+    --safe-top:env(safe-area-inset-top,0px); --safe-bot:env(safe-area-inset-bottom,0px);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:linear-gradient(160deg,#fdf6fa 0%,#f6effa 55%,#fdf9f6 100%);
+    color:var(--tinta); min-height:100dvh; padding-bottom:calc(90px + var(--safe-bot));
+  }
+  .cabecera{
+    padding:calc(14px + var(--safe-top)) 18px 10px;
+    text-align:center;
+  }
+  .cabecera h1{
+    font-family:Georgia,"Times New Roman",serif; font-weight:600; font-size:24px; color:var(--rosa-osc);
+    letter-spacing:.5px;
+  }
+  .cabecera .sub{font-size:12px;color:var(--tinta-suave);margin-top:2px;letter-spacing:2px;text-transform:uppercase}
+
+  /* ---- barra de mes ---- */
+  .barra-mes{
+    display:flex;align-items:center;justify-content:space-between;
+    margin:10px 16px 8px;background:var(--blanco);border-radius:var(--radio);
+    box-shadow:var(--sombra);padding:8px 10px;
+  }
+  .barra-mes .mes{font-family:Georgia,serif;font-size:19px;font-weight:600;color:var(--tinta);text-transform:capitalize}
+  .flecha{
+    width:40px;height:40px;border:none;border-radius:14px;background:var(--rosa-claro);
+    color:var(--rosa-osc);font-size:20px;font-weight:700;cursor:pointer;
+  }
+  .flecha:active{background:var(--rosa);color:#fff}
+  .btn-hoy{
+    border:none;background:var(--lila-claro);color:var(--lila);font-weight:700;font-size:13px;
+    border-radius:12px;padding:8px 12px;cursor:pointer;margin-left:6px;
+  }
+
+  /* ---- calendario ---- */
+  .calendario{margin:0 16px;background:var(--blanco);border-radius:var(--radio);box-shadow:var(--sombra);padding:12px 8px 10px}
+  .dias-semana,.semana{display:grid;grid-template-columns:repeat(7,1fr)}
+  .dias-semana span{text-align:center;font-size:11px;font-weight:700;color:var(--tinta-suave);padding-bottom:8px;letter-spacing:1px}
+  .dia{
+    aspect-ratio:1/1.15; display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+    border-radius:14px;cursor:pointer;padding-top:6px;position:relative;border:2px solid transparent;
+  }
+  .dia .num{font-size:15px;font-weight:600;line-height:1.6}
+  .dia.otro-mes .num{color:#cdbfd0}
+  .dia.hoy .num{
+    background:var(--lila);color:#fff;width:28px;height:28px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;line-height:1;
+  }
+  .dia.seleccionado{background:var(--rosa-claro);border-color:var(--rosa)}
+  .puntos{display:flex;gap:3px;margin-top:3px;flex-wrap:wrap;justify-content:center;max-width:90%}
+  .puntos i{width:6px;height:6px;border-radius:50%;display:block}
+  .dia .mas{font-size:9px;color:var(--rosa-osc);font-weight:800}
+
+  /* ---- agenda del día ---- */
+  .panel-dia{margin:14px 16px 0}
+  .titulo-dia{
+    display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;padding:0 4px;
+  }
+  .titulo-dia h2{font-family:Georgia,serif;font-size:18px;color:var(--rosa-osc);font-weight:600;text-transform:capitalize}
+  .titulo-dia .cuenta{font-size:12.5px;color:var(--tinta-suave);font-weight:600}
+  .cita{
+    display:flex;gap:12px;background:var(--blanco);border-radius:var(--radio);box-shadow:var(--sombra);
+    padding:14px;margin-bottom:10px;cursor:pointer;align-items:stretch;
+  }
+  .cita .franja{width:5px;border-radius:6px;flex-shrink:0}
+  .cita .hora-col{min-width:52px;text-align:center;align-self:center}
+  .cita .hora-col .h{font-size:17px;font-weight:800;color:var(--tinta)}
+  .cita .hora-col .d{font-size:10.5px;color:var(--tinta-suave);font-weight:600}
+  .cita .info{flex:1;align-self:center;min-width:0}
+  .cita .nombre{font-size:16px;font-weight:700}
+  .cita .servicio{font-size:13px;color:var(--tinta-suave);margin-top:1px}
+  .cita .extra{font-size:12px;color:var(--tinta-suave);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cita .extra a{color:var(--lila);text-decoration:none;font-weight:700}
+  .cita .extra.domi{color:var(--rosa-osc);font-weight:700}
+  .cita .notas{font-size:12px;color:var(--lila);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cita .precio{align-self:center;font-weight:800;color:var(--rosa-osc);font-size:15px;white-space:nowrap}
+  .vacio{
+    text-align:center;color:var(--tinta-suave);background:var(--blanco);border-radius:var(--radio);
+    padding:26px 16px;box-shadow:var(--sombra);font-size:14.5px;
+  }
+  .vacio .emo{font-size:30px;display:block;margin-bottom:6px}
+  .total-dia{
+    text-align:right;font-size:13px;color:var(--tinta-suave);font-weight:700;padding:2px 6px 0;
+  }
+
+  /* ---- botones inferiores ---- */
+  .barra-inferior{
+    position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;align-items:center;
+    padding:10px 16px calc(10px + var(--safe-bot));
+    background:linear-gradient(to top,rgba(253,246,250,.97) 70%,rgba(253,246,250,0));
+    pointer-events:none;
+  }
+  .barra-inferior button{pointer-events:auto}
+  .btn-resumen{
+    flex:1;border:none;border-radius:16px;padding:15px 12px;font-size:15px;font-weight:800;cursor:pointer;
+    background:linear-gradient(135deg,var(--lila),var(--rosa));color:#fff;
+    box-shadow:0 6px 18px rgba(155,142,196,.4);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .btn-mas{
+    width:56px;height:56px;border:none;border-radius:18px;font-size:28px;font-weight:600;cursor:pointer;
+    background:linear-gradient(135deg,var(--rosa),var(--lila));color:#fff;
+    box-shadow:0 6px 18px rgba(150,82,126,.4);flex-shrink:0;line-height:1;
+  }
+  .btn-ajustes{
+    width:44px;height:44px;border:none;border-radius:14px;background:var(--blanco);box-shadow:var(--sombra);
+    font-size:19px;cursor:pointer;flex-shrink:0;color:var(--rosa-osc);
+  }
+
+  /* ---- hoja modal ---- */
+  .fondo-modal{
+    position:fixed;inset:0;background:rgba(74,53,70,.45);display:none;z-index:50;
+    align-items:flex-end;justify-content:center;
+  }
+  .fondo-modal.abierto{display:flex}
+  .hoja{
+    background:var(--crema);width:100%;max-width:520px;border-radius:24px 24px 0 0;
+    padding:20px 20px calc(20px + var(--safe-bot));max-height:88dvh;overflow-y:auto;
+    animation:subir .22s ease-out;
+  }
+  @keyframes subir{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+  .hoja h3{font-family:Georgia,serif;font-size:19px;color:var(--rosa-osc);margin-bottom:14px;text-align:center}
+  .campo{margin-bottom:12px}
+  .campo label{display:block;font-size:12px;font-weight:700;color:var(--tinta-suave);margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase}
+  .campo input,.campo select,.campo textarea{
+    width:100%;border:1.5px solid #e9d9e4;border-radius:13px;padding:12px 13px;font-size:16px;
+    background:var(--blanco);color:var(--tinta);font-family:inherit;outline:none;
+  }
+  .campo input:focus,.campo select:focus,.campo textarea:focus{border-color:var(--rosa)}
+  .fila-2{display:flex;gap:10px}.fila-2 .campo{flex:1}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    border:1.5px solid #e9d9e4;background:var(--blanco);border-radius:99px;padding:9px 14px;
+    font-size:14px;font-weight:600;color:var(--tinta-suave);cursor:pointer;
+    transition:transform .1s;user-select:none;-webkit-user-select:none;
+  }
+  .chip:active{transform:scale(.95)}
+  .chip.activo{
+    background:linear-gradient(135deg,var(--rosa),var(--lila));color:#fff;border-color:transparent;
+    box-shadow:0 3px 10px rgba(150,82,126,.3);
+  }
+  #campoOtro{display:none;margin-top:10px}
+  #campoOtro.ver{display:block}
+  #campoDireccion{display:none;margin-top:10px}
+  #campoDireccion.ver{display:block}
+  .chip.lugar{flex:1;text-align:center;padding:11px 10px}
+  .botones-hoja{display:flex;gap:10px;margin-top:16px}
+  .btn-guardar{
+    flex:1;border:none;border-radius:14px;padding:14px;font-size:16px;font-weight:800;cursor:pointer;
+    background:linear-gradient(135deg,var(--rosa),var(--lila));color:#fff;
+  }
+  .btn-cancelar{
+    border:none;border-radius:14px;padding:14px 18px;font-size:15px;font-weight:700;cursor:pointer;
+    background:#eee2ea;color:var(--tinta-suave);
+  }
+  .btn-borrar{
+    width:100%;margin-top:10px;border:none;border-radius:14px;padding:12px;font-size:14px;font-weight:700;
+    cursor:pointer;background:#fdeaea;color:#c0392b;display:none;
+  }
+  .confirmar-borrado{display:none;margin-top:10px;background:#fdeaea;border-radius:14px;padding:12px;text-align:center}
+  .confirmar-borrado p{font-size:14px;color:#c0392b;font-weight:700;margin-bottom:10px}
+  .confirmar-borrado .si{background:#c0392b;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-weight:800;font-size:14px;cursor:pointer;margin-right:8px}
+  .confirmar-borrado .no{background:#fff;color:var(--tinta-suave);border:none;border-radius:10px;padding:10px 18px;font-weight:700;font-size:14px;cursor:pointer}
+
+  /* ---- ajustes ---- */
+  .hoja .opcion{
+    display:block;width:100%;text-align:left;border:none;background:var(--blanco);border-radius:14px;
+    padding:14px;font-size:15px;font-weight:600;color:var(--tinta);margin-bottom:10px;cursor:pointer;
+    box-shadow:0 2px 8px rgba(150,82,126,.08);
+  }
+  .hoja .opcion small{display:block;font-weight:500;color:var(--tinta-suave);font-size:12px;margin-top:2px}
+  .hoja textarea.copia{height:110px;font-size:12px}
+  .aviso-ok{
+    position:fixed;top:calc(16px + var(--safe-top));left:50%;transform:translateX(-50%);
+    background:var(--tinta);color:#fff;font-size:14px;font-weight:600;padding:10px 18px;border-radius:99px;
+    z-index:99;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;
+  }
+  .aviso-ok.ver{opacity:1}
+
+  /* ---- pantalla de resumen de hoy ---- */
+  .fondo-resumen{
+    position:fixed;inset:0;background:rgba(74,53,70,.5);display:none;z-index:60;
+    align-items:center;justify-content:center;padding:22px;
+  }
+  .fondo-resumen.abierto{display:flex}
+  .tarjeta-resumen{
+    background:linear-gradient(170deg,#fff 0%,#fdf4f9 100%);width:100%;max-width:420px;
+    border-radius:26px;padding:24px 20px 18px;box-shadow:0 20px 60px rgba(74,53,70,.35);
+    max-height:82dvh;overflow-y:auto;animation:aparecer .28s ease-out;text-align:center;
+    border:1.5px solid #f1dceb;
+  }
+  @keyframes aparecer{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+  .tarjeta-resumen .saludo{font-family:Georgia,serif;font-size:22px;color:var(--rosa-osc);font-weight:600}
+  .tarjeta-resumen .fecha-res{font-size:13px;color:var(--tinta-suave);margin-top:3px;text-transform:capitalize;letter-spacing:.5px}
+  .tarjeta-resumen .separador{height:1.5px;background:linear-gradient(to right,transparent,#eccfe0,transparent);margin:14px 0}
+  .res-cita{
+    display:flex;gap:10px;align-items:center;text-align:left;background:#fff;border-radius:14px;
+    padding:10px 12px;margin-bottom:8px;box-shadow:0 2px 10px rgba(150,82,126,.08);
+  }
+  .res-cita .bolita{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  .res-cita .rh{font-weight:800;font-size:15px;min-width:48px;color:var(--tinta)}
+  .res-cita .rtexto{flex:1;min-width:0}
+  .res-cita .rn{font-weight:700;font-size:14.5px}
+  .res-cita .rs{font-size:12px;color:var(--tinta-suave)}
+  .res-cita .rp{font-weight:800;color:var(--rosa-osc);font-size:14px;white-space:nowrap}
+  .res-libre{font-size:15px;color:var(--tinta-suave);padding:10px 0 4px}
+  .res-libre .emo{font-size:34px;display:block;margin-bottom:8px}
+  .res-total{font-size:13.5px;font-weight:800;color:var(--tinta-suave);margin-top:4px}
+  .btn-empezar{
+    width:100%;margin-top:14px;border:none;border-radius:16px;padding:15px;font-size:16px;font-weight:800;
+    cursor:pointer;background:linear-gradient(135deg,var(--rosa),var(--lila));color:#fff;
+    box-shadow:0 6px 18px rgba(150,82,126,.35);
+  }
+  .enlace-wa{
+    display:inline-flex;align-items:center;gap:6px;margin-top:12px;border:none;background:none;
+    color:#1faa53;font-size:13px;font-weight:700;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <h1>✨ Agenda de Delfi ✨</h1>
+  <div class="sub">Citas de clientas</div>
+</header>
+
+<div class="barra-mes">
+  <button class="flecha" id="prevMes" aria-label="Mes anterior">‹</button>
+  <div style="display:flex;align-items:center">
+    <div class="mes" id="tituloMes"></div>
+    <button class="btn-hoy" id="btnHoy">Hoy</button>
+  </div>
+  <button class="flecha" id="sigMes" aria-label="Mes siguiente">›</button>
+</div>
+
+<div class="calendario">
+  <div class="dias-semana">
+    <span>LU</span><span>MA</span><span>MI</span><span>JU</span><span>VI</span><span>SÁ</span><span>DO</span>
+  </div>
+  <div id="rejilla"></div>
+</div>
+
+<section class="panel-dia">
+  <div class="titulo-dia">
+    <h2 id="tituloDia"></h2>
+    <span class="cuenta" id="cuentaDia"></span>
+  </div>
+  <div id="listaCitas"></div>
+  <div class="total-dia" id="totalDia"></div>
+</section>
+
+<div class="barra-inferior">
+  <button class="btn-ajustes" id="btnAjustes" aria-label="Ajustes">⚙️</button>
+  <button class="btn-resumen" id="btnResumen">🌞 Resumen de hoy</button>
+  <button class="btn-mas" id="btnNueva" aria-label="Nueva cita">+</button>
+</div>
+
+<!-- Modal cita -->
+<div class="fondo-modal" id="modalCita">
+  <div class="hoja">
+    <h3 id="tituloModal">Nueva cita 💅</h3>
+    <div class="campo">
+      <label>Nombre</label>
+      <input type="text" id="fNombre" placeholder="Nombre de la clienta" autocomplete="off">
+    </div>
+    <div class="campo">
+      <label>Teléfono</label>
+      <input type="tel" id="fTelefono" inputmode="tel" placeholder="Ej.: 600 123 456" autocomplete="off">
+    </div>
+    <div class="fila-2">
+      <div class="campo">
+        <label>Día</label>
+        <input type="date" id="fFecha">
+      </div>
+      <div class="campo">
+        <label>Hora</label>
+        <input type="time" id="fHora">
+      </div>
+    </div>
+    <div class="campo">
+      <label>Tipo de tratamiento</label>
+      <div class="chips" id="chipsTratamiento"></div>
+      <div id="campoOtro">
+        <input type="text" id="fOtro" placeholder="Escribe el tratamiento nuevo…" autocomplete="off">
+      </div>
+    </div>
+    <div class="campo">
+      <label>Lugar</label>
+      <div class="chips" id="chipsLugar">
+        <div class="chip lugar activo" id="chipCasa">🏠 En casa</div>
+        <div class="chip lugar" id="chipDomicilio">🚗 A domicilio</div>
+      </div>
+      <div id="campoDireccion">
+        <input type="text" id="fDireccion" placeholder="Dirección de la clienta" autocomplete="off">
+      </div>
+    </div>
+    <div class="fila-2">
+      <div class="campo">
+        <label>Duración</label>
+        <select id="fDuracion">
+          <option value="15">15 min</option><option value="30" selected>30 min</option>
+          <option value="45">45 min</option><option value="60">1 hora</option>
+          <option value="90">1 h 30</option><option value="120">2 horas</option>
+          <option value="150">2 h 30</option><option value="180">3 horas</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label>Precio (€)</label>
+        <input type="number" id="fPrecio" inputmode="decimal" placeholder="0" min="0" step="0.5">
+      </div>
+    </div>
+    <div class="campo">
+      <label>Notas</label>
+      <textarea id="fNotas" rows="2" placeholder="Teléfono, detalles, recordatorios…"></textarea>
+    </div>
+    <div class="botones-hoja">
+      <button class="btn-cancelar" id="btnCancelar">Cancelar</button>
+      <button class="btn-guardar" id="btnGuardar">Guardar cita</button>
+    </div>
+    <button class="btn-borrar" id="btnBorrar">🗑 Eliminar esta cita</button>
+    <div class="confirmar-borrado" id="confirmarBorrado">
+      <p>¿Seguro que quieres eliminar esta cita?</p>
+      <button class="si" id="borrarSi">Sí, eliminar</button>
+      <button class="no" id="borrarNo">No</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal ajustes -->
+<div class="fondo-modal" id="modalAjustes">
+  <div class="hoja">
+    <h3>Ajustes 🌸</h3>
+    <button class="opcion" id="opCopia">📤 Guardar copia de seguridad
+      <small>Comparte tus citas por WhatsApp o guárdalas en Notas, por si cambias de móvil.</small>
+    </button>
+    <button class="opcion" id="opRestaurar">📥 Restaurar copia de seguridad
+      <small>Pega aquí una copia guardada para recuperar tus citas.</small>
+    </button>
+    <div class="campo" id="zonaRestaurar" style="display:none">
+      <label>Pega aquí tu copia</label>
+      <textarea class="copia" id="textoRestaurar" placeholder='Pega el texto que empieza por {"citas":…'></textarea>
+      <div class="botones-hoja">
+        <button class="btn-guardar" id="btnRestaurar">Restaurar</button>
+      </div>
+    </div>
+    <div class="botones-hoja">
+      <button class="btn-cancelar" style="flex:1" id="btnCerrarAjustes">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pantalla emergente: resumen de hoy -->
+<div class="fondo-resumen" id="pantallaResumen">
+  <div class="tarjeta-resumen">
+    <div class="saludo" id="resSaludo">✨ ¡Hola, Delfi! ✨</div>
+    <div class="fecha-res" id="resFecha"></div>
+    <div class="separador"></div>
+    <div id="resLista"></div>
+    <div class="res-total" id="resTotal"></div>
+    <button class="btn-empezar" id="btnEmpezar">Ver mi calendario 💖</button>
+    <button class="enlace-wa" id="btnCompartirWa">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Compartir por WhatsApp
+    </button>
+  </div>
+</div>
+
+<div class="aviso-ok" id="avisoOk"></div>
+
+<script>
+(function(){
+  "use strict";
+  var CLAVE = "agenda_delfi_v1";
+  var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  var DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+  var COLORES = ["#b76e9b","#9b8ec4","#e8a2b8","#7fb5a8","#d4a15e","#8fa6d6","#c98a8a"];
+  var TRATAMIENTOS = ["Alisado","Botox","Hidratación","Corte","Tinte","Cejas","Maquillaje","Ondas"];
+
+  // ---- almacenamiento (con reserva en memoria si el navegador no deja guardar) ----
+  var memoria = null;
+  function cargar(){
+    try{
+      var t = localStorage.getItem(CLAVE);
+      if(t){ return JSON.parse(t); }
+    }catch(e){}
+    return memoria || { citas: [] };
+  }
+  function guardarDatos(d){
+    memoria = d;
+    try{ localStorage.setItem(CLAVE, JSON.stringify(d)); }catch(e){}
+  }
+
+  var datos = cargar();
+  if(!datos || !Array.isArray(datos.citas)) datos = { citas: [] };
+
+  var hoy = new Date();
+  var vistaAnio = hoy.getFullYear(), vistaMes = hoy.getMonth();
+  var seleccionado = claveFecha(hoy);
+  var editandoId = null;
+
+  function claveFecha(d){
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
+  }
+  function desdeClave(k){
+    var p = k.split("-");
+    return new Date(+p[0], +p[1]-1, +p[2]);
+  }
+  function colorServicio(s){
+    s = (s||"").toLowerCase().trim();
+    var h = 0;
+    for(var i=0;i<s.length;i++){ h = (h*31 + s.charCodeAt(i)) >>> 0; }
+    return COLORES[h % COLORES.length];
+  }
+  function citasDe(k){
+    return datos.citas.filter(function(c){ return c.fecha === k; })
+      .sort(function(a,b){ return (a.hora||"").localeCompare(b.hora||""); });
+  }
+  function textoDuracion(min){
+    min = +min || 0;
+    if(min < 60) return min + " min";
+    var h = Math.floor(min/60), m = min % 60;
+    return h + " h" + (m ? " " + m : "");
+  }
+  function esc(t){
+    return String(t==null?"":t).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  // ---- calendario ----
+  function pintarCalendario(){
+    document.getElementById("tituloMes").textContent = MESES[vistaMes] + " " + vistaAnio;
+    var rejilla = document.getElementById("rejilla");
+    rejilla.innerHTML = "";
+    var primero = new Date(vistaAnio, vistaMes, 1);
+    var desplaz = (primero.getDay() + 6) % 7; // lunes = 0
+    var inicio = new Date(vistaAnio, vistaMes, 1 - desplaz);
+    var claveHoy = claveFecha(new Date());
+    for(var s=0; s<6; s++){
+      var fila = document.createElement("div");
+      fila.className = "semana";
+      for(var d=0; d<7; d++){
+        var f = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + s*7 + d);
+        var k = claveFecha(f);
+        var celda = document.createElement("div");
+        celda.className = "dia";
+        if(f.getMonth() !== vistaMes) celda.className += " otro-mes";
+        if(k === claveHoy) celda.className += " hoy";
+        if(k === seleccionado) celda.className += " seleccionado";
+        var num = document.createElement("div");
+        num.className = "num"; num.textContent = f.getDate();
+        celda.appendChild(num);
+        var cs = citasDe(k);
+        if(cs.length){
+          var puntos = document.createElement("div"); puntos.className = "puntos";
+          for(var i=0; i<Math.min(cs.length,4); i++){
+            var p = document.createElement("i");
+            p.style.background = colorServicio(cs[i].servicio);
+            puntos.appendChild(p);
+          }
+          celda.appendChild(puntos);
+          if(cs.length > 4){
+            var mas = document.createElement("div"); mas.className = "mas"; mas.textContent = "+" + (cs.length-4);
+            celda.appendChild(mas);
+          }
+        }
+        (function(kk){
+          celda.addEventListener("click", function(){
+            seleccionado = kk;
+            var ff = desdeClave(kk);
+            if(ff.getMonth() !== vistaMes || ff.getFullYear() !== vistaAnio){
+              vistaMes = ff.getMonth(); vistaAnio = ff.getFullYear();
+            }
+            pintarTodo();
+          });
+        })(k);
+        fila.appendChild(celda);
+      }
+      rejilla.appendChild(fila);
+    }
+  }
+
+  // ---- agenda del día ----
+  function pintarDia(){
+    var f = desdeClave(seleccionado);
+    var claveHoy = claveFecha(new Date());
+    var titulo = (seleccionado === claveHoy ? "Hoy · " : "") + DIAS[f.getDay()] + " " + f.getDate() + " de " + MESES[f.getMonth()];
+    document.getElementById("tituloDia").textContent = titulo;
+    var cs = citasDe(seleccionado);
+    document.getElementById("cuentaDia").textContent = cs.length ? (cs.length + (cs.length===1?" cita":" citas")) : "";
+    var lista = document.getElementById("listaCitas");
+    lista.innerHTML = "";
+    if(!cs.length){
+      lista.innerHTML = '<div class="vacio"><span class="emo">🌷</span>No hay citas este día.<br>Toca <b>+</b> para añadir una.</div>';
+      document.getElementById("totalDia").textContent = "";
+      return;
+    }
+    var total = 0;
+    cs.forEach(function(c){
+      total += (+c.precio || 0);
+      var el = document.createElement("div");
+      el.className = "cita";
+      el.innerHTML =
+        '<div class="franja" style="background:' + colorServicio(c.servicio) + '"></div>' +
+        '<div class="hora-col"><div class="h">' + esc(c.hora||"–") + '</div><div class="d">' + textoDuracion(c.duracion) + '</div></div>' +
+        '<div class="info"><div class="nombre">' + esc(c.nombre) + '</div>' +
+        (c.servicio ? '<div class="servicio">' + esc(c.servicio) + '</div>' : '') +
+        (c.telefono ? '<div class="extra"><a class="tel-link" href="tel:' + esc(c.telefono.replace(/\s/g,"")) + '">📞 ' + esc(c.telefono) + '</a></div>' : '') +
+        (c.lugar === "domicilio" ? '<div class="extra domi">🚗 A domicilio · ' + esc(c.direccion||"") + '</div>' : '') +
+        (c.notas ? '<div class="notas">📝 ' + esc(c.notas) + '</div>' : '') + '</div>' +
+        (c.precio ? '<div class="precio">' + esc(c.precio) + ' €</div>' : '');
+      el.addEventListener("click", function(){ abrirModal(c.id); });
+      var tl = el.querySelector(".tel-link");
+      if(tl) tl.addEventListener("click", function(e){ e.stopPropagation(); });
+      lista.appendChild(el);
+    });
+    document.getElementById("totalDia").textContent = total ? ("Total del día: " + total + " €") : "";
+  }
+
+  function pintarTodo(){ pintarCalendario(); pintarDia(); }
+
+  // ---- chips de tratamiento ----
+  var chipsBox = document.getElementById("chipsTratamiento");
+  TRATAMIENTOS.forEach(function(t){
+    var ch = document.createElement("div");
+    ch.className = "chip"; ch.textContent = t; ch.dataset.trat = t;
+    ch.addEventListener("click", function(){ ch.classList.toggle("activo"); });
+    chipsBox.appendChild(ch);
+  });
+  var chipOtro = document.createElement("div");
+  chipOtro.className = "chip"; chipOtro.textContent = "Otros ✏️";
+  chipOtro.addEventListener("click", function(){
+    chipOtro.classList.toggle("activo");
+    document.getElementById("campoOtro").classList.toggle("ver", chipOtro.classList.contains("activo"));
+    if(chipOtro.classList.contains("activo")) document.getElementById("fOtro").focus();
+  });
+  chipsBox.appendChild(chipOtro);
+
+  function ponerTratamientos(texto){
+    var partes = (texto||"").split(",").map(function(s){ return s.trim(); }).filter(Boolean);
+    var otros = [];
+    var mapa = {};
+    TRATAMIENTOS.forEach(function(t){ mapa[t.toLowerCase()] = t; });
+    chipsBox.querySelectorAll(".chip").forEach(function(ch){ ch.classList.remove("activo"); });
+    partes.forEach(function(p){
+      var t = mapa[p.toLowerCase()];
+      if(t){
+        var ch = chipsBox.querySelector('[data-trat="' + t + '"]');
+        if(ch) ch.classList.add("activo");
+      } else {
+        otros.push(p);
+      }
+    });
+    document.getElementById("fOtro").value = otros.join(", ");
+    chipOtro.classList.toggle("activo", otros.length > 0);
+    document.getElementById("campoOtro").classList.toggle("ver", otros.length > 0);
+  }
+  function leerTratamientos(){
+    var sel = [];
+    TRATAMIENTOS.forEach(function(t){
+      var ch = chipsBox.querySelector('[data-trat="' + t + '"]');
+      if(ch && ch.classList.contains("activo")) sel.push(t);
+    });
+    if(chipOtro.classList.contains("activo")){
+      var o = document.getElementById("fOtro").value.trim();
+      if(o) sel.push(o);
+    }
+    return sel.join(", ");
+  }
+
+  // ---- lugar: en casa / a domicilio ----
+  var chipCasa = document.getElementById("chipCasa");
+  var chipDomicilio = document.getElementById("chipDomicilio");
+  function ponerLugar(lugar){
+    var dom = lugar === "domicilio";
+    chipCasa.classList.toggle("activo", !dom);
+    chipDomicilio.classList.toggle("activo", dom);
+    document.getElementById("campoDireccion").classList.toggle("ver", dom);
+  }
+  chipCasa.addEventListener("click", function(){ ponerLugar("casa"); });
+  chipDomicilio.addEventListener("click", function(){
+    ponerLugar("domicilio");
+    document.getElementById("fDireccion").focus();
+  });
+
+  // ---- modal cita ----
+  var modal = document.getElementById("modalCita");
+  function abrirModal(id){
+    editandoId = id || null;
+    var c = id ? datos.citas.find(function(x){ return x.id === id; }) : null;
+    document.getElementById("tituloModal").textContent = c ? "Editar cita ✏️" : "Nueva cita 💅";
+    document.getElementById("fNombre").value = c ? c.nombre : "";
+    document.getElementById("fTelefono").value = c ? (c.telefono||"") : "";
+    ponerTratamientos(c ? (c.servicio||"") : "");
+    ponerLugar(c ? (c.lugar||"casa") : "casa");
+    document.getElementById("fDireccion").value = c ? (c.direccion||"") : "";
+    document.getElementById("fFecha").value = c ? c.fecha : seleccionado;
+    document.getElementById("fHora").value = c ? (c.hora||"") : "";
+    document.getElementById("fDuracion").value = c ? String(c.duracion||30) : "30";
+    document.getElementById("fPrecio").value = c && c.precio ? c.precio : "";
+    document.getElementById("fNotas").value = c ? (c.notas||"") : "";
+    document.getElementById("btnBorrar").style.display = c ? "block" : "none";
+    document.getElementById("confirmarBorrado").style.display = "none";
+    modal.classList.add("abierto");
+  }
+  function cerrarModal(){ modal.classList.remove("abierto"); }
+
+  document.getElementById("btnNueva").addEventListener("click", function(){ abrirModal(null); });
+  document.getElementById("btnCancelar").addEventListener("click", cerrarModal);
+  modal.addEventListener("click", function(e){ if(e.target === modal) cerrarModal(); });
+
+  document.getElementById("btnGuardar").addEventListener("click", function(){
+    var nombre = document.getElementById("fNombre").value.trim();
+    var fecha = document.getElementById("fFecha").value;
+    var esDomicilio = chipDomicilio.classList.contains("activo");
+    var direccion = document.getElementById("fDireccion").value.trim();
+    if(!nombre){ aviso("Escribe el nombre de la clienta 🙂"); return; }
+    if(!fecha){ aviso("Elige el día 🙂"); return; }
+    if(esDomicilio && !direccion){ aviso("Es a domicilio: escribe la dirección 🏠"); return; }
+    var cita = {
+      id: editandoId || String(Date.now()) + Math.random().toString(36).slice(2,6),
+      nombre: nombre,
+      telefono: document.getElementById("fTelefono").value.trim(),
+      servicio: leerTratamientos(),
+      lugar: esDomicilio ? "domicilio" : "casa",
+      direccion: esDomicilio ? direccion : "",
+      fecha: fecha,
+      hora: document.getElementById("fHora").value,
+      duracion: +document.getElementById("fDuracion").value,
+      precio: document.getElementById("fPrecio").value ? +document.getElementById("fPrecio").value : "",
+      notas: document.getElementById("fNotas").value.trim()
+    };
+    if(editandoId){
+      datos.citas = datos.citas.map(function(c){ return c.id === editandoId ? cita : c; });
+    } else {
+      datos.citas.push(cita);
+    }
+    guardarDatos(datos);
+    seleccionado = fecha;
+    var ff = desdeClave(fecha);
+    vistaMes = ff.getMonth(); vistaAnio = ff.getFullYear();
+    cerrarModal();
+    pintarTodo();
+    aviso("Cita guardada 💖");
+  });
+
+  document.getElementById("btnBorrar").addEventListener("click", function(){
+    document.getElementById("confirmarBorrado").style.display = "block";
+  });
+  document.getElementById("borrarNo").addEventListener("click", function(){
+    document.getElementById("confirmarBorrado").style.display = "none";
+  });
+  document.getElementById("borrarSi").addEventListener("click", function(){
+    datos.citas = datos.citas.filter(function(c){ return c.id !== editandoId; });
+    guardarDatos(datos);
+    cerrarModal();
+    pintarTodo();
+    aviso("Cita eliminada");
+  });
+
+  // ---- navegación ----
+  document.getElementById("prevMes").addEventListener("click", function(){
+    vistaMes--; if(vistaMes < 0){ vistaMes = 11; vistaAnio--; }
+    pintarCalendario();
+  });
+  document.getElementById("sigMes").addEventListener("click", function(){
+    vistaMes++; if(vistaMes > 11){ vistaMes = 0; vistaAnio++; }
+    pintarCalendario();
+  });
+  document.getElementById("btnHoy").addEventListener("click", function(){
+    var h = new Date();
+    vistaAnio = h.getFullYear(); vistaMes = h.getMonth(); seleccionado = claveFecha(h);
+    pintarTodo();
+  });
+
+  // ---- pantalla emergente: resumen de hoy ----
+  var pantallaRes = document.getElementById("pantallaResumen");
+
+  function saludoHora(){
+    var h = new Date().getHours();
+    if(h < 6)  return "🌙 ¡Hola, Delfi! 🌙";
+    if(h < 13) return "🌞 ¡Buenos días, Delfi! 🌞";
+    if(h < 21) return "✨ ¡Buenas tardes, Delfi! ✨";
+    return "🌙 ¡Buenas noches, Delfi! 🌙";
+  }
+
+  function mostrarResumen(){
+    var hoyD = new Date();
+    var k = claveFecha(hoyD);
+    var cs = citasDe(k);
+    document.getElementById("resSaludo").textContent = saludoHora();
+    document.getElementById("resFecha").textContent = "Hoy · " + DIAS[hoyD.getDay()] + " " + hoyD.getDate() + " de " + MESES[hoyD.getMonth()] + " de " + hoyD.getFullYear();
+    var lista = document.getElementById("resLista");
+    lista.innerHTML = "";
+    var total = 0;
+    if(!cs.length){
+      lista.innerHTML = '<div class="res-libre"><span class="emo">🌷</span>Hoy no tienes citas.<br>¡Disfruta de tu día!</div>';
+      document.getElementById("resTotal").textContent = "";
+    } else {
+      cs.forEach(function(c){
+        total += (+c.precio || 0);
+        var el = document.createElement("div");
+        el.className = "res-cita";
+        var det = [];
+        if(c.servicio) det.push(esc(c.servicio));
+        if(c.lugar === "domicilio") det.push("🚗 A domicilio · " + esc(c.direccion||""));
+        if(c.telefono) det.push("📞 " + esc(c.telefono));
+        if(c.notas) det.push("📝 " + esc(c.notas));
+        el.innerHTML =
+          '<span class="bolita" style="background:' + colorServicio(c.servicio) + '"></span>' +
+          '<span class="rh">' + esc(c.hora||"–") + '</span>' +
+          '<span class="rtexto"><span class="rn">' + esc(c.nombre) + '</span>' +
+          (det.length ? '<div class="rs">' + det.join('<br>') + '</div>' : '') +
+          '</span>' +
+          (c.precio ? '<span class="rp">' + esc(c.precio) + ' €</span>' : '');
+        lista.appendChild(el);
+      });
+      document.getElementById("resTotal").textContent =
+        "Hoy: " + cs.length + (cs.length===1?" cita":" citas") + (total ? " · " + total + " € en total" : "");
+    }
+    pantallaRes.classList.add("abierto");
+  }
+  function cerrarResumen(){ pantallaRes.classList.remove("abierto"); }
+
+  document.getElementById("btnEmpezar").addEventListener("click", cerrarResumen);
+  pantallaRes.addEventListener("click", function(e){ if(e.target === pantallaRes) cerrarResumen(); });
+  document.getElementById("btnResumen").addEventListener("click", function(){
+    var h = new Date();
+    vistaAnio = h.getFullYear(); vistaMes = h.getMonth(); seleccionado = claveFecha(h);
+    pintarTodo();
+    mostrarResumen();
+  });
+
+  // Compartir el resumen por WhatsApp (opcional, desde la pantalla emergente)
+  document.getElementById("btnCompartirWa").addEventListener("click", function(){
+    var f = new Date();
+    var cs = citasDe(claveFecha(f));
+    var lineas = [];
+    lineas.push("✨ *Agenda de Delfi* ✨");
+    lineas.push("Hoy, " + DIAS[f.getDay()] + " " + f.getDate() + " de " + MESES[f.getMonth()]);
+    lineas.push("");
+    if(!cs.length){
+      lineas.push("🌷 Hoy no hay citas. ¡Día libre!");
+    } else {
+      var total = 0;
+      cs.forEach(function(c){
+        total += (+c.precio || 0);
+        var l = "💅 " + (c.hora || "—") + " · *" + c.nombre + "*";
+        if(c.servicio) l += " · " + c.servicio;
+        if(c.precio) l += " · " + c.precio + "€";
+        lineas.push(l);
+        if(c.lugar === "domicilio") lineas.push("      🚗 A domicilio: " + (c.direccion||""));
+        if(c.telefono) lineas.push("      📞 " + c.telefono);
+        if(c.notas) lineas.push("      📝 " + c.notas);
+      });
+      lineas.push("");
+      lineas.push("Total: " + cs.length + (cs.length===1?" cita":" citas") + (total ? " · " + total + " €" : ""));
+    }
+    lineas.push("");
+    lineas.push("¡Que tengas un día precioso! 💖");
+    window.open("https://wa.me/?text=" + encodeURIComponent(lineas.join("\n")), "_blank");
+  });
+
+  // ---- ajustes / copia de seguridad ----
+  var modalAj = document.getElementById("modalAjustes");
+  document.getElementById("btnAjustes").addEventListener("click", function(){
+    document.getElementById("zonaRestaurar").style.display = "none";
+    modalAj.classList.add("abierto");
+  });
+  document.getElementById("btnCerrarAjustes").addEventListener("click", function(){ modalAj.classList.remove("abierto"); });
+  modalAj.addEventListener("click", function(e){ if(e.target === modalAj) modalAj.classList.remove("abierto"); });
+
+  document.getElementById("opCopia").addEventListener("click", function(){
+    var texto = "Copia de seguridad – Agenda de Delfi (" + new Date().toLocaleDateString("es-ES") + ")\n" + JSON.stringify(datos);
+    if(navigator.share){
+      navigator.share({ title: "Copia Agenda Delfi", text: texto }).catch(function(){});
+    } else if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(texto).then(function(){ aviso("Copia copiada. Pégala en Notas 📋"); });
+    } else {
+      window.prompt("Copia este texto y guárdalo:", texto);
+    }
+  });
+  document.getElementById("opRestaurar").addEventListener("click", function(){
+    var z = document.getElementById("zonaRestaurar");
+    z.style.display = z.style.display === "none" ? "block" : "none";
+  });
+  document.getElementById("btnRestaurar").addEventListener("click", function(){
+    var t = document.getElementById("textoRestaurar").value;
+    var i = t.indexOf("{");
+    if(i < 0){ aviso("Ese texto no parece una copia válida 🤔"); return; }
+    try{
+      var d = JSON.parse(t.slice(i));
+      if(!d || !Array.isArray(d.citas)) throw new Error("formato");
+      datos = d;
+      guardarDatos(datos);
+      modalAj.classList.remove("abierto");
+      pintarTodo();
+      aviso("¡Citas restauradas! 🎉 (" + d.citas.length + ")");
+    }catch(e){
+      aviso("Ese texto no parece una copia válida 🤔");
+    }
+  });
+
+  // ---- avisos ----
+  var tAviso = null;
+  function aviso(t){
+    var el = document.getElementById("avisoOk");
+    el.textContent = t;
+    el.classList.add("ver");
+    clearTimeout(tAviso);
+    tAviso = setTimeout(function(){ el.classList.remove("ver"); }, 2200);
+  }
+
+  pintarTodo();
+  mostrarResumen(); // nada más abrir la app, el resumen de hoy
+})();
+</script>
+</body>
+</html>
