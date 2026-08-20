@@ -279,6 +279,25 @@
     display:inline-flex;align-items:center;gap:6px;margin-top:12px;border:none;background:none;
     color:#1faa53;font-size:13px;font-weight:700;cursor:pointer;
   }
+  .wa-link{
+    color:#1faa53;text-decoration:none;font-weight:800;margin-left:10px;
+  }
+  .res-manana{margin-top:16px;text-align:left;background:var(--lila-claro);border-radius:16px;padding:12px}
+  .res-manana h4{font-size:14px;font-weight:800;color:var(--lila);margin-bottom:8px;text-transform:capitalize}
+  .manana-fila{
+    display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;
+    padding:9px 10px;margin-bottom:6px;
+  }
+  .manana-fila .mtexto{flex:1;font-size:13.5px;font-weight:700;color:var(--tinta);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .manana-fila .mtexto small{display:block;font-weight:600;color:var(--tinta-suave);font-size:11.5px}
+  .btn-confirmar{
+    border:none;border-radius:10px;background:#25D366;color:#fff;font-size:12.5px;font-weight:800;
+    padding:9px 10px;cursor:pointer;white-space:nowrap;font-family:inherit;
+  }
+  .btn-recordatorio{
+    width:100%;margin-top:10px;border:none;border-radius:14px;padding:12px;font-size:14px;font-weight:700;
+    cursor:pointer;background:var(--lila-claro);color:var(--lila);font-family:inherit;
+  }
 </style>
 </head>
 <body>
@@ -353,7 +372,8 @@
     <h3 id="tituloModal">Nueva cita 💅</h3>
     <div class="campo">
       <label>Nombre</label>
-      <input type="text" id="fNombre" placeholder="Nombre de la clienta" autocomplete="off">
+      <input type="text" id="fNombre" list="listaClientas" placeholder="Nombre de la clienta" autocomplete="off">
+      <datalist id="listaClientas"></datalist>
     </div>
     <div class="campo">
       <label>Teléfono</label>
@@ -409,6 +429,7 @@
       <button class="btn-cancelar" id="btnCancelar">Cancelar</button>
       <button class="btn-guardar" id="btnGuardar">Guardar cita</button>
     </div>
+    <button class="btn-recordatorio" id="btnRecordatorio">🔔 Ponerme un recordatorio en el iPhone (avisa 24 h antes)</button>
     <button class="btn-borrar" id="btnBorrar">🗑 Eliminar esta cita</button>
     <div class="confirmar-borrado" id="confirmarBorrado">
       <p>¿Seguro que quieres eliminar esta cita?</p>
@@ -449,6 +470,7 @@
     <div class="separador"></div>
     <div id="resLista"></div>
     <div class="res-total" id="resTotal"></div>
+    <div id="resManana"></div>
     <button class="btn-empezar" id="btnEmpezar">Ver mi calendario 💖</button>
     <button class="enlace-wa" id="btnCompartirWa">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -517,6 +539,22 @@
     return String(t==null?"":t).replace(/[&<>"']/g,function(c){
       return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
     });
+  }
+  function telWhatsApp(t){
+    var d = String(t||"").replace(/\D/g,"");
+    if(d.slice(0,2) === "00") d = d.slice(2);
+    if(d.length === 9) d = "34" + d; // número español sin prefijo
+    return d;
+  }
+  function mensajeConfirmacion(c){
+    var f = desdeClave(c.fecha);
+    var m = "¡Hola" + (c.nombre ? " " + c.nombre : "") + "! 💖 Soy Delfi. Te recuerdo tu cita de mañana, " +
+      DIAS[f.getDay()] + " " + f.getDate() + " de " + MESES[f.getMonth()] +
+      (c.hora ? " a las " + c.hora : "") +
+      (c.servicio ? " (" + c.servicio + ")" : "") + ".";
+    if(c.lugar === "domicilio" && c.direccion) m += " Voy a tu domicilio: " + c.direccion + ".";
+    m += " ¿Me confirmas que te viene bien? ¡Gracias! 🌸";
+    return m;
   }
 
   // ---- calendario ----
@@ -603,13 +641,14 @@
       '<div class="hora-col"><div class="h">' + esc(c.hora||"–") + '</div><div class="d">' + textoDuracion(c.duracion) + '</div></div>' +
       '<div class="info"><div class="nombre">' + esc(c.nombre) + '</div>' +
       (c.servicio ? '<div class="servicio">' + esc(c.servicio) + '</div>' : '') +
-      (c.telefono ? '<div class="extra"><a class="tel-link" href="tel:' + esc(c.telefono.replace(/\s/g,"")) + '">📞 ' + esc(c.telefono) + '</a></div>' : '') +
+      (c.telefono ? '<div class="extra"><a class="tel-link" href="tel:' + esc(c.telefono.replace(/\s/g,"")) + '">📞 ' + esc(c.telefono) + '</a><a class="wa-link" href="https://wa.me/' + telWhatsApp(c.telefono) + '" target="_blank" rel="noopener">💬 WhatsApp</a></div>' : '') +
       (c.lugar === "domicilio" ? '<div class="extra domi">🚗 A domicilio · ' + esc(c.direccion||"") + '</div>' : '') +
       (c.notas ? '<div class="notas">📝 ' + esc(c.notas) + '</div>' : '') + '</div>' +
       (c.precio ? '<div class="precio">' + esc(c.precio) + ' €</div>' : '');
     el.addEventListener("click", function(){ abrirModal(c.id); });
-    var tl = el.querySelector(".tel-link");
-    if(tl) tl.addEventListener("click", function(e){ e.stopPropagation(); });
+    el.querySelectorAll(".tel-link,.wa-link").forEach(function(a){
+      a.addEventListener("click", function(e){ e.stopPropagation(); });
+    });
     return el;
   }
 
@@ -720,7 +759,7 @@
     pintarMes();
   });
 
-  function pintarTodo(){ pintarCalendario(); pintarDia(); pintarSemana(); pintarMes(); }
+  function pintarTodo(){ pintarCalendario(); pintarDia(); pintarSemana(); pintarMes(); pintarClientas(); }
 
   // ---- chips de tratamiento ----
   var chipsBox = document.getElementById("chipsTratamiento");
@@ -770,6 +809,86 @@
     }
     return sel.join(", ");
   }
+
+  // ---- memoria de clientas: autocompletar ----
+  function pintarClientas(){
+    var dl = document.getElementById("listaClientas");
+    dl.innerHTML = "";
+    var vistos = {};
+    for(var i = datos.citas.length - 1; i >= 0; i--){
+      var n = (datos.citas[i].nombre||"").trim();
+      if(n && !vistos[n.toLowerCase()]){
+        vistos[n.toLowerCase()] = 1;
+        var o = document.createElement("option"); o.value = n; dl.appendChild(o);
+      }
+    }
+  }
+  function ultimaCitaDe(filtro){
+    for(var i = datos.citas.length - 1; i >= 0; i--){
+      var c = datos.citas[i];
+      if(c.id !== editandoId && filtro(c)) return c;
+    }
+    return null;
+  }
+  function rellenarClienta(c){
+    if(!c) return false;
+    var fN = document.getElementById("fNombre");
+    var fT = document.getElementById("fTelefono");
+    var fD = document.getElementById("fDireccion");
+    var relleno = false;
+    if(!fN.value.trim() && c.nombre){ fN.value = c.nombre; relleno = true; }
+    if(!fT.value.trim() && c.telefono){ fT.value = c.telefono; relleno = true; }
+    if(!fD.value.trim() && c.direccion){ fD.value = c.direccion; relleno = true; }
+    if(relleno) aviso("Clienta conocida: datos recuperados ✨");
+    return relleno;
+  }
+  document.getElementById("fTelefono").addEventListener("change", function(){
+    var d = telWhatsApp(this.value);
+    if(d.length < 9) return;
+    rellenarClienta(ultimaCitaDe(function(c){ return c.telefono && telWhatsApp(c.telefono) === d; }));
+  });
+  document.getElementById("fNombre").addEventListener("change", function(){
+    var n = this.value.trim().toLowerCase();
+    if(!n) return;
+    rellenarClienta(ultimaCitaDe(function(c){ return (c.nombre||"").trim().toLowerCase() === n; }));
+  });
+
+  // ---- recordatorio en el calendario del iPhone (.ics con aviso 24 h antes) ----
+  document.getElementById("btnRecordatorio").addEventListener("click", function(){
+    var nombre = document.getElementById("fNombre").value.trim();
+    var fecha = document.getElementById("fFecha").value;
+    var hora = document.getElementById("fHora").value;
+    if(!fecha || !hora){ aviso("Pon el día y la hora primero 🙂"); return; }
+    var dur = +document.getElementById("fDuracion").value || 30;
+    var trat = leerTratamientos();
+    var p = fecha.split("-"), h = hora.split(":");
+    var ini = new Date(+p[0], +p[1]-1, +p[2], +h[0], +h[1]);
+    var fin = new Date(ini.getTime() + dur * 60000);
+    function fIcs(d){
+      function z(n){ return String(n).padStart(2,"0"); }
+      return d.getFullYear() + z(d.getMonth()+1) + z(d.getDate()) + "T" + z(d.getHours()) + z(d.getMinutes()) + "00";
+    }
+    var lineas = [
+      "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//AgendaDelfi//ES",
+      "BEGIN:VEVENT",
+      "UID:" + fecha.replace(/-/g,"") + hora.replace(/:/g,"") + "@agendadelfi",
+      "DTSTAMP:" + fIcs(ini),
+      "DTSTART:" + fIcs(ini),
+      "DTEND:" + fIcs(fin),
+      "SUMMARY:💖 Cita: " + (nombre||"clienta") + (trat ? " (" + trat + ")" : ""),
+      "BEGIN:VALARM","TRIGGER:-PT24H","ACTION:DISPLAY",
+      "DESCRIPTION:Mañana tienes cita con " + (nombre||"una clienta"),
+      "END:VALARM","END:VEVENT","END:VCALENDAR"
+    ];
+    var blob = new Blob([lineas.join("\r\n")], {type: "text/calendar"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "cita-" + (nombre||"clienta").toLowerCase().replace(/\s+/g,"-") + ".ics";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+    aviso("Abre el archivo y dale a «Añadir» al calendario 📆");
+  });
 
   // ---- lugar: en casa / a domicilio ----
   var chipCasa = document.getElementById("chipCasa");
@@ -922,6 +1041,40 @@
       });
       document.getElementById("resTotal").textContent =
         "Hoy: " + cs.length + (cs.length===1?" cita":" citas") + (total ? " · " + total + " € en total" : "");
+    }
+
+    // citas de mañana: pedir confirmación por WhatsApp con un toque
+    var man = new Date(hoyD.getFullYear(), hoyD.getMonth(), hoyD.getDate() + 1);
+    var csMan = citasDe(claveFecha(man));
+    var cajaMan = document.getElementById("resManana");
+    cajaMan.innerHTML = "";
+    if(csMan.length){
+      var caja = document.createElement("div");
+      caja.className = "res-manana";
+      caja.innerHTML = '<h4>🔔 Mañana · ' + DIAS[man.getDay()] + ' ' + man.getDate() + '</h4>';
+      csMan.forEach(function(c){
+        var fila = document.createElement("div");
+        fila.className = "manana-fila";
+        fila.innerHTML =
+          '<div class="mtexto">' + esc(c.hora||"–") + ' · ' + esc(c.nombre) +
+          (c.servicio ? '<small>' + esc(c.servicio) + '</small>' : '') + '</div>';
+        if(c.telefono){
+          var b = document.createElement("button");
+          b.className = "btn-confirmar";
+          b.textContent = "📲 Pedir confirmación";
+          b.addEventListener("click", function(){
+            window.open("https://wa.me/" + telWhatsApp(c.telefono) + "?text=" + encodeURIComponent(mensajeConfirmacion(c)), "_blank");
+          });
+          fila.appendChild(b);
+        } else {
+          var s = document.createElement("small");
+          s.textContent = "sin teléfono";
+          s.style.cssText = "color:#c98a8a;font-weight:700;font-size:11px";
+          fila.appendChild(s);
+        }
+        caja.appendChild(fila);
+      });
+      cajaMan.appendChild(caja);
     }
     pantallaRes.classList.add("abierto");
   }
