@@ -446,6 +446,22 @@
     <button class="opcion" id="opCopia">📤 Guardar copia de seguridad
       <small>Comparte tus citas por WhatsApp o guárdalas en Notas, por si cambias de móvil.</small>
     </button>
+    <button class="opcion" id="opPlantilla">✏️ Mensaje de confirmación
+      <small>Cambia el mensaje que se les manda a las clientas para confirmar su cita.</small>
+    </button>
+    <div class="campo" id="zonaPlantilla" style="display:none">
+      <label>Tu mensaje</label>
+      <textarea class="copia" id="textoPlantilla" style="height:130px;font-size:14px"></textarea>
+      <small style="display:block;color:var(--tinta-suave);font-size:12px;margin-top:6px;line-height:1.5">
+        Las palabras entre corchetes se cambian solas en cada mensaje:
+        <b>[NOMBRE]</b> = la clienta · <b>[DIA]</b> = el día de la cita · <b>[HORA]</b> = la hora ·
+        <b>[SERVICIO]</b> = el tratamiento · <b>[DIRECCION]</b> = si es a domicilio, su dirección
+      </small>
+      <div class="botones-hoja">
+        <button class="btn-cancelar" id="btnPlantillaDef" style="font-size:13px">Volver al original</button>
+        <button class="btn-guardar" id="btnPlantillaGuardar">Guardar mensaje</button>
+      </div>
+    </div>
     <button class="opcion" id="opRestaurar">📥 Restaurar copia de seguridad
       <small>Pega aquí una copia guardada para recuperar tus citas.</small>
     </button>
@@ -546,15 +562,16 @@
     if(d.length === 9) d = "34" + d; // número español sin prefijo
     return d;
   }
+  var PLANTILLA_DEF = "¡Hola [NOMBRE]! 💖 Soy Delfi. Te recuerdo tu cita de mañana, [DIA] a las [HORA] ([SERVICIO]). [DIRECCION]¿Me confirmas que te viene bien? ¡Gracias! 🌸";
   function mensajeConfirmacion(c){
     var f = desdeClave(c.fecha);
-    var m = "¡Hola" + (c.nombre ? " " + c.nombre : "") + "! 💖 Soy Delfi. Te recuerdo tu cita de mañana, " +
-      DIAS[f.getDay()] + " " + f.getDate() + " de " + MESES[f.getMonth()] +
-      (c.hora ? " a las " + c.hora : "") +
-      (c.servicio ? " (" + c.servicio + ")" : "") + ".";
-    if(c.lugar === "domicilio" && c.direccion) m += " Voy a tu domicilio: " + c.direccion + ".";
-    m += " ¿Me confirmas que te viene bien? ¡Gracias! 🌸";
-    return m;
+    var t = (datos.plantilla || PLANTILLA_DEF);
+    t = t.split("[NOMBRE]").join(c.nombre || "");
+    t = t.split("[DIA]").join(DIAS[f.getDay()] + " " + f.getDate() + " de " + MESES[f.getMonth()]);
+    t = t.split("[HORA]").join(c.hora || "");
+    t = t.split("[SERVICIO]").join(c.servicio || "");
+    t = t.split("[DIRECCION]").join(c.lugar === "domicilio" && c.direccion ? "Voy a tu domicilio: " + c.direccion + ". " : "");
+    return t.replace(/\(\s*\)/g, "").replace(/\s{2,}/g, " ").replace(/\s+([.,!?])/g, "$1").trim();
   }
 
   // ---- calendario ----
@@ -1138,6 +1155,27 @@
       window.prompt("Copia este texto y guárdalo:", texto);
     }
   });
+  document.getElementById("opPlantilla").addEventListener("click", function(){
+    var z = document.getElementById("zonaPlantilla");
+    var abrir = z.style.display === "none";
+    z.style.display = abrir ? "block" : "none";
+    if(abrir) document.getElementById("textoPlantilla").value = datos.plantilla || PLANTILLA_DEF;
+  });
+  document.getElementById("btnPlantillaGuardar").addEventListener("click", function(){
+    var t = document.getElementById("textoPlantilla").value.trim();
+    if(!t){ aviso("El mensaje no puede estar vacío 🙂"); return; }
+    datos.plantilla = t;
+    guardarDatos(datos);
+    document.getElementById("zonaPlantilla").style.display = "none";
+    aviso("Mensaje guardado ✏️💖");
+  });
+  document.getElementById("btnPlantillaDef").addEventListener("click", function(){
+    document.getElementById("textoPlantilla").value = PLANTILLA_DEF;
+    delete datos.plantilla;
+    guardarDatos(datos);
+    aviso("Mensaje original restaurado");
+  });
+
   document.getElementById("opRestaurar").addEventListener("click", function(){
     var z = document.getElementById("zonaRestaurar");
     z.style.display = z.style.display === "none" ? "block" : "none";
